@@ -29,16 +29,14 @@ import io.ebean.PagedList;
 import org.joda.time.DateTime;
 import org.springframework.util.StringUtils;
 import play.libs.Json;
+import play.mvc.Http;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 /**
  * EbeanDataTableQuery.
@@ -68,7 +66,7 @@ public class EbeanDataTablesQuery<T extends Model> {
      * The fields display suppliers. If set for a given field, the supplier will be called when forging the ajax response object.
      * If not set, the answer will try to reach the variable on the given T class.
      */
-    private final Map<String, Function<T, String>> fieldsDisplaySupplier;
+    private final Map<String, BiFunction<T, Http.Request, String>> fieldsDisplaySupplier;
 
     /**
      * The fields search handler. If set for a given field, the handler will be called when searching on that field.
@@ -189,6 +187,17 @@ public class EbeanDataTablesQuery<T extends Model> {
      * @param fieldSupplier the field display supplier
      */
     public void setFieldDisplaySupplier(final String field, final Function<T, String> fieldSupplier) {
+        this.fieldsDisplaySupplier.put(field, (t, request) -> fieldSupplier.apply(t));
+    }
+
+    /**
+     * The fields display suppliers. If set for a given field, the supplier will be called when forging the ajax response object.
+     * If not set, the answer will try to reach the variable on the given T class.
+     *
+     * @param field         the field name
+     * @param fieldSupplier the field display supplier
+     */
+    public void setFieldDisplaySupplier(final String field, final BiFunction<T, Http.Request, String> fieldSupplier) {
         this.fieldsDisplaySupplier.put(field, fieldSupplier);
     }
 
@@ -310,19 +319,20 @@ public class EbeanDataTablesQuery<T extends Model> {
     /**
      * Build the Ajax result in the form of a Json ObjectNode. Parameters SHOULD come from a form.
      *
+     * @param request    the request
      * @param parameters the parameters
      * @return the Json ObjectNode
      * @see AjaxQueryForm
      * @see Parameters
      */
-    public ObjectNode getAjaxResult(final Parameters parameters) {
+    public ObjectNode getAjaxResult(final Http.Request request, final Parameters parameters) {
         final Map<Integer, Column> indexedColumns = parameters.getIndexedColumns();
         final PagedList<T> pagedList = this.getPagedList(parameters, indexedColumns);
         final ObjectNode result = Json.newObject();
         final ArrayNode data = Json.newArray();
 
         for (final T t : pagedList.getList()) {
-            data.add(this.objectToArrayNode(t, indexedColumns));
+            data.add(this.objectToArrayNode(request, t, indexedColumns));
         }
 
         result.put("draw", parameters.getDraw());
@@ -336,11 +346,12 @@ public class EbeanDataTablesQuery<T extends Model> {
     /**
      * Convert an object to an Array node using the indexed columns.
      *
+     * @param request        the request
      * @param t              the object
      * @param indexedColumns the indexed column
      * @return the array node
      */
-    private ArrayNode objectToArrayNode(final T t, final Map<Integer, Column> indexedColumns) {
+    private ArrayNode objectToArrayNode(final Http.Request request,final T t, final Map<Integer, Column> indexedColumns) {
         final ArrayNode data = Json.newArray();
 
         for (int i = 0; i < indexedColumns.size(); i++) {
@@ -351,7 +362,7 @@ public class EbeanDataTablesQuery<T extends Model> {
             }
 
             if (this.fieldsDisplaySupplier.containsKey(column.getName())) {
-                data.add(this.fieldsDisplaySupplier.get(column.getName()).apply(t));
+                data.add(this.fieldsDisplaySupplier.get(column.getName()).apply(t, request));
             } else {
                 final Method method = this.methodForColumn(column);
                 if (method == null) {
