@@ -89,8 +89,8 @@ Your webpage can be build using the scala template engine or anything else. The 
 <html>
     <head>
         <meta charset="UTF-8"/>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-        <script src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="//cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
     </head>
     <body>
         <table id="my-list">
@@ -112,7 +112,7 @@ Your webpage can be build using the scala template engine or anything else. The 
                     ajax: {
                         type: "POST",
                         contentType: "application/json; charset=utf-8",
-                        url: "@controllers.testController.GET_AjaxData",
+                        url: "@controllers.routes.MyController.POST_AjaxDatatable",
                         data: function (d) {
                             return JSON.stringify({parameters: d});
                         }
