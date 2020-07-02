@@ -18,7 +18,7 @@ $> mvn package
 
 In your ```build.sbt``` file, you need to add a resolver to jitpack and the dependency for the module. This translate to the following lines.
 
-```sbtshell
+```scala
 resolvers += "jitpack" at "https://jitpack.io"
 
 libraryDependencies += "com.jackson42" % "play-ebean-datatables" % "release~20.07"
