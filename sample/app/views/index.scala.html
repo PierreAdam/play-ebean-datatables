@@ -1,0 +1,98 @@
+@()
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8"/>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="//cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"/>
+        <link rel="stylesheet" href="//cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css"/>
+        <script>
+            // Add a DataTableSearch method to jquery in order to make the search input simpler to handle.
+            jQuery.fn.extend({
+                DataTableSearch: function (table, columnNumber, event) {
+                    var $this = $(this);
+                    event = event || "auto";
+
+                    if (event === "auto") {
+                        if ($this.is("input")) {
+                            event = "keyup change";
+                        } else {
+                            event = "change";
+                        }
+                    }
+
+                    $this.on(event, function () {
+                        var column = table.columns(columnNumber);
+                        if (column.search() !== this.value) {
+                            column.search(this.value).draw();
+                        }
+                    });
+                    return $this;
+                }
+            })
+        </script>
+    </head>
+    <body>
+        <div>
+            <div class="form-group mg-b-10-force">
+                <label for="nameOrEmail" class="form-control-label">Search in name or email</label>
+                <input type="text" id="nameOrEmail" value="" class="form-control">
+            </div>
+        </div>
+        <br/>
+        <div>
+            <table id="my-list" style="width:100%">
+                <thead>
+                    <tr>
+                        <th style="width:">Id</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+
+        <script>
+            $(document).ready(function () {
+                table = $('#my-list').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: {
+                        type: "POST",
+                        contentType: "application/json; charset=utf-8",
+                        url: "@controllers.routes.HomeController.POST_DatatablesAccount()",
+                        data: function (d) {
+                            return JSON.stringify({parameters: d});
+                        }
+                    },
+                    searching: true,
+                    dom: "ltipr",
+                    columns: [{
+                        name: "id",
+                        orderable: true,
+                        searchable: true
+                    }, {
+                        name: "name",
+                        orderable: true,
+                        searchable: true
+                    }, {
+                        name: "email",
+                        orderable: true,
+                        searchable: true
+                    }, {
+                        name: "actions",
+                        orderable: false,
+                        searchable: false
+                    }],
+                    order: [[0, "asc"]],
+                    columnDefs: []
+                });
+                // Set the input nameOrEmail as search field for the column email (2)
+                $("#nameOrEmail").DataTableSearch(table, 2);
+            });
+        </script>
+    </body>
+</html>
