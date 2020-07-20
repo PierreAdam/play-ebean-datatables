@@ -1,6 +1,6 @@
 # Play-Ebean-Datatables
 
-[![Travis CI](https://api.travis-ci.org/PierreAdam/play-ebean-datatables.svg)](https://travis-ci.org/github/PierreAdam/play-ebean-datatables)
+[![Build Status](https://travis-ci.com/PierreAdam/play-ebean-datatables.svg?branch=master)](https://travis-ci.com/PierreAdam/play-ebean-datatables)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/PierreAdam/PlayForm-JodaDataBinder/master/LICENSE)
 
 Play-Ebean-Datatables is a library for play framework that allows you to easily integrate [Datatables](https://datatables.net/) in your Play project that use Ebean as an ORM.
