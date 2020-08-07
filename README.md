@@ -1,7 +1,7 @@
 # Play-Ebean-Datatables
 
 [![Build Status](https://travis-ci.com/PierreAdam/play-ebean-datatables.svg?branch=master)](https://travis-ci.com/PierreAdam/play-ebean-datatables)
-[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/PierreAdam/PlayForm-JodaDataBinder/master/LICENSE)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/PierreAdam/play-ebean-datatables/master/LICENSE)
 
 Play-Ebean-Datatables is a library for play framework that allows you to easily integrate [Datatables](https://datatables.net/) in your Play project that use Ebean as an ORM.
 *****
@@ -21,7 +21,7 @@ In your ```build.sbt``` file, you need to add a resolver to jitpack and the depe
 ```scala
 resolvers += "jitpack" at "https://jitpack.io"
 
-libraryDependencies += "com.github.PierreAdam" % "play-ebean-datatables" % "release~20.07"
+libraryDependencies += "com.github.PierreAdam" % "play-ebean-datatables" % "release~20.08u1"
 ```
 
 ## How to use the library
@@ -146,4 +146,4 @@ Your webpage can be build using the scala template engine or anything else. The 
 ```
 
 ## License
-This project is released under terms of the [MIT license](https://raw.githubusercontent.com/PierreAdam/PlayForm-JodaDataBinder/master/LICENSE).
+This project is released under terms of the [MIT license](https://raw.githubusercontent.com/PierreAdam/play-ebean-datatables/master/LICENSE).

@@ -30,6 +30,7 @@ import org.joda.time.DateTime;
 import org.springframework.util.StringUtils;
 import play.libs.Json;
 import play.mvc.Http;
+import play.twirl.api.Html;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -199,6 +200,28 @@ public class EbeanDataTablesQuery<T extends Model> {
      */
     public void setFieldDisplaySupplier(final String field, final BiFunction<T, Http.Request, String> fieldSupplier) {
         this.fieldsDisplaySupplier.put(field, fieldSupplier);
+    }
+
+    /**
+     * The fields display suppliers. If set for a given field, the supplier will be called when forging the ajax response object.
+     * If not set, the answer will try to reach the variable on the given T class.
+     *
+     * @param field         the field name
+     * @param fieldSupplier the field display supplier
+     */
+    public void setFieldDisplayHtmlSupplier(final String field, final Function<T, Html> fieldSupplier) {
+        this.fieldsDisplaySupplier.put(field, (t, request) -> fieldSupplier.apply(t).body());
+    }
+
+    /**
+     * The fields display suppliers. If set for a given field, the supplier will be called when forging the ajax response object.
+     * If not set, the answer will try to reach the variable on the given T class.
+     *
+     * @param field         the field name
+     * @param fieldSupplier the field display supplier
+     */
+    public void setFieldDisplayHtmlSupplier(final String field, final BiFunction<T, Http.Request, Html> fieldSupplier) {
+        this.fieldsDisplaySupplier.put(field, (t, request) -> fieldSupplier.apply(t, request).body());
     }
 
     /**
