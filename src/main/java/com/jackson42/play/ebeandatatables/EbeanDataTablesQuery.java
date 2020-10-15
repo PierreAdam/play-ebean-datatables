@@ -1,4 +1,6 @@
 /*
+ * MIT License
+ *
  * Copyright (c) 2020 Pierre Adam
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -8,8 +10,16 @@
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 package com.jackson42.play.ebeandatatables;
@@ -22,12 +32,17 @@ import com.jackson42.play.ebeandatatables.entities.Column;
 import com.jackson42.play.ebeandatatables.entities.Order;
 import com.jackson42.play.ebeandatatables.entities.Parameters;
 import com.jackson42.play.ebeandatatables.enumerations.OrderEnum;
+import com.jackson42.play.ebeandatatables.interfaces.TriFunction;
 import io.ebean.ExpressionList;
 import io.ebean.Finder;
 import io.ebean.Model;
 import io.ebean.PagedList;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
+import play.i18n.Messages;
+import play.i18n.MessagesApi;
 import play.libs.Json;
 import play.mvc.Http;
 import play.twirl.api.Html;
@@ -49,6 +64,11 @@ import java.util.function.*;
 public class EbeanDataTablesQuery<T extends Model> {
 
     /**
+     * The Logger.
+     */
+    protected final Logger logger;
+
+    /**
      * The potential prefixes of the getter in the target classes.
      */
     protected static final String[] METHOD_PREFIXES = {"get", "is", "has", "can"};
@@ -57,6 +77,11 @@ public class EbeanDataTablesQuery<T extends Model> {
      * The finder of T
      */
     private final Finder<?, T> finder;
+
+    /**
+     * The Messages api.
+     */
+    private final MessagesApi messagesApi;
 
     /**
      * The class of T
@@ -99,13 +124,16 @@ public class EbeanDataTablesQuery<T extends Model> {
     /**
      * Constructor.
      *
-     * @param finder the finder
-     * @param tClass the tClass
-     * @param where  the initial where close
+     * @param finder      the finder
+     * @param tClass      the tClass
+     * @param messagesApi the messages api
+     * @param where       the initial where close
      */
-    public EbeanDataTablesQuery(final Finder<?, T> finder, final Class<T> tClass, final Consumer<ExpressionList<T>> where) {
+    public EbeanDataTablesQuery(final Finder<?, T> finder, final Class<T> tClass, final MessagesApi messagesApi, final Consumer<ExpressionList<T>> where) {
+        this.logger = LoggerFactory.getLogger(this.getClass());
         this.finder = finder;
         this.tClass = tClass;
+        this.messagesApi = messagesApi;
         this.where = where;
         this.fieldsDisplaySupplier = new HashMap<>();
         this.fieldsSearchHandler = new HashMap<>();
@@ -117,11 +145,22 @@ public class EbeanDataTablesQuery<T extends Model> {
     /**
      * Constructor
      *
+     * @param finder      the finder
+     * @param tClass      the tClass
+     * @param messagesApi the messages api
+     */
+    public EbeanDataTablesQuery(final Finder<?, T> finder, final Class<T> tClass, final MessagesApi messagesApi) {
+        this(finder, tClass, messagesApi, null);
+    }
+
+    /**
+     * Constructor
+     *
      * @param finder the finder
      * @param tClass the tClass
      */
     public EbeanDataTablesQuery(final Finder<?, T> finder, final Class<T> tClass) {
-        this(finder, tClass, null);
+        this(finder, tClass, null, null);
     }
 
     /**
@@ -130,7 +169,7 @@ public class EbeanDataTablesQuery<T extends Model> {
      * @param tClass the tClass
      */
     public EbeanDataTablesQuery(final Class<T> tClass) {
-        this(new Finder<>(tClass), tClass, null);
+        this(new Finder<>(tClass), tClass, null, null);
     }
 
     /**
@@ -225,6 +264,27 @@ public class EbeanDataTablesQuery<T extends Model> {
     }
 
     /**
+     * The fields display suppliers. If set for a given field, the supplier will be called when forging the ajax response object.
+     * If not set, the answer will try to reach the variable on the given T class.
+     *
+     * @param field         the field name
+     * @param fieldSupplier the field display supplier
+     */
+    public void setFieldDisplayHtmlSupplier(final String field, final TriFunction<T, Http.Request, Messages, Html> fieldSupplier) {
+        this.fieldsDisplaySupplier.put(field, (t, request) -> {
+            Messages messages = null;
+            if (this.messagesApi != null) {
+                messages = this.messagesApi.preferred(request);
+            } else {
+                this.logger.error("setFieldDisplayHtmlSupplier(field, TriFunction<T, Http.Request, Messages, Html>" +
+                        "has been used with EbeanDataTablesQuery initialized without MessagesAPI." +
+                        "The Messages argument will be null.");
+            }
+            return fieldSupplier.apply(t, request, messages).body();
+        });
+    }
+
+    /**
      * The fields search handler. If set for a given field, the handler will be called when searching on that field.
      * If not set, the search will have no effect.
      *
@@ -308,7 +368,11 @@ public class EbeanDataTablesQuery<T extends Model> {
         final ExpressionList<T> query = this.forgeQuery().setFirstRow(parameters.getStart()).setMaxRows(parameters.getLength()).where();
 
         if (parameters.getSearch() != null && parameters.getSearch().getValue() != null && !parameters.getSearch().getValue().isEmpty()) {
-            this.globalSearchHandler.accept(query, parameters.getSearch().getValue());
+            if (this.globalSearchHandler != null) {
+                this.globalSearchHandler.accept(query, parameters.getSearch().getValue());
+            } else {
+                this.logger.warn("A global search has been asked for but the global search handler is null. setGlobalSearchHandler needs to be called.");
+            }
         }
 
         for (int i = 0; i < indexedColumns.size(); i++) {
@@ -374,7 +438,7 @@ public class EbeanDataTablesQuery<T extends Model> {
      * @param indexedColumns the indexed column
      * @return the array node
      */
-    private ArrayNode objectToArrayNode(final Http.Request request,final T t, final Map<Integer, Column> indexedColumns) {
+    private ArrayNode objectToArrayNode(final Http.Request request, final T t, final Map<Integer, Column> indexedColumns) {
         final ArrayNode data = Json.newArray();
 
         for (int i = 0; i < indexedColumns.size(); i++) {

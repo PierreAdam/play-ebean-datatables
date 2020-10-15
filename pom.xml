@@ -7,7 +7,7 @@
 
     <groupId>com.jackson42</groupId>
     <artifactId>play-ebean-datatables</artifactId>
-    <version>20.08</version>
+    <version>20.10</version>
     <packaging>jar</packaging>
     <name>Play-EbeanDataTables</name>
     <description>A PlayFramework abstraction of the usage of Datatables with Ebean as a source</description>
