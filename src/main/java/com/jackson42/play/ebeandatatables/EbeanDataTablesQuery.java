@@ -332,8 +332,9 @@ public class EbeanDataTablesQuery<T extends Model> {
      * @see AjaxQueryForm
      * @see Parameters
      */
+    @Deprecated
     public PagedList<T> getPagedList(final Parameters parameters) {
-        return this.getPagedList(parameters, parameters.getIndexedColumns());
+        return this.getPagedList(parameters, parameters.getIndexedColumns(), null);
     }
 
     /**
@@ -362,10 +363,15 @@ public class EbeanDataTablesQuery<T extends Model> {
      *
      * @param parameters     the parameters
      * @param indexedColumns the columns indexed
+     * @param extraQuery     the extra query
      * @return the paged list
      */
-    private PagedList<T> getPagedList(final Parameters parameters, final Map<Integer, Column> indexedColumns) {
+    private PagedList<T> getPagedList(final Parameters parameters, final Map<Integer, Column> indexedColumns, final Consumer<ExpressionList<T>> extraQuery) {
         final ExpressionList<T> query = this.forgeQuery().setFirstRow(parameters.getStart()).setMaxRows(parameters.getLength()).where();
+
+        if (extraQuery != null) {
+            extraQuery.accept(query);
+        }
 
         if (parameters.getSearch() != null && parameters.getSearch().getValue() != null && !parameters.getSearch().getValue().isEmpty()) {
             if (this.globalSearchHandler != null) {
@@ -408,13 +414,14 @@ public class EbeanDataTablesQuery<T extends Model> {
      *
      * @param request    the request
      * @param parameters the parameters
+     * @param extraQuery the extra query
      * @return the Json ObjectNode
      * @see AjaxQueryForm
      * @see Parameters
      */
-    public ObjectNode getAjaxResult(final Http.Request request, final Parameters parameters) {
+    public ObjectNode getAjaxResult(final Http.Request request, final Parameters parameters, final Consumer<ExpressionList<T>> extraQuery) {
         final Map<Integer, Column> indexedColumns = parameters.getIndexedColumns();
-        final PagedList<T> pagedList = this.getPagedList(parameters, indexedColumns);
+        final PagedList<T> pagedList = this.getPagedList(parameters, indexedColumns, extraQuery);
         final ObjectNode result = Json.newObject();
         final ArrayNode data = Json.newArray();
 
@@ -428,6 +435,19 @@ public class EbeanDataTablesQuery<T extends Model> {
         result.set("data", data);
 
         return result;
+    }
+
+    /**
+     * Build the Ajax result in the form of a Json ObjectNode. Parameters SHOULD come from a form.
+     *
+     * @param request    the request
+     * @param parameters the parameters
+     * @return the Json ObjectNode
+     * @see AjaxQueryForm
+     * @see Parameters
+     */
+    public ObjectNode getAjaxResult(final Http.Request request, final Parameters parameters) {
+        return this.getAjaxResult(request, parameters, null);
     }
 
     /**
