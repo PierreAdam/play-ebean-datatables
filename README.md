@@ -21,7 +21,7 @@ In your ```build.sbt``` file, you need to add a resolver to jitpack and the depe
 ```scala
 resolvers += "jitpack" at "https://jitpack.io"
 
-libraryDependencies += "com.github.PierreAdam" % "play-ebean-datatables" % "release~20.10u1"
+libraryDependencies += "com.github.PierreAdam" % "play-ebean-datatables" % "release~20.10u2"
 ```
 
 ## How to use the library

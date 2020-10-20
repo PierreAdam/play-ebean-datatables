@@ -428,9 +428,12 @@ public class EbeanDataTablesQuery<T extends Model> {
         for (final T t : pagedList.getList()) {
             data.add(this.objectToArrayNode(request, t, indexedColumns));
         }
-
+        final ExpressionList<T> recordsTotalQuery = this.forgeQuery();
+        if (extraQuery != null) {
+            extraQuery.accept(recordsTotalQuery);
+        }
         result.put("draw", parameters.getDraw());
-        result.put("recordsTotal", this.forgeQuery().findCount());
+        result.put("recordsTotal", recordsTotalQuery.findCount());
         result.put("recordsFiltered", pagedList.getTotalCount());
         result.set("data", data);
 
