@@ -13,6 +13,12 @@ $> mvn compile
 $> mvn package
 ```
 
+#### Deployment
+
+```shell
+$> mvn verify
+$> mvn deploy
+```
 
 ## How to import the library
 
@@ -144,6 +150,21 @@ Your webpage can be build using the scala template engine or anything else. The 
     </body>
 </html>
 ```
+
+## Versions
+
+| Library Version | Play Version | Ebean Version | Tested DataTables Version  |
+|-----------------|--------------|---------------|----------------------------|
+| 20.11x          | 2.8.x        | 12.6.x        | 1.10.x                     |
+| 20.10x          | 2.8.x        | 12.4.x        | 1.10.x                     |
+
+## Changelog
+
+#### 20.11
+- Remove deprecated method `getPagedList`.
+- Deprecate method `setInitialQuerySupplier`. Should only be set on the constructors to avoid race conditions when using the same instance for multiple requests.
+- New constructors allowing more coherent behavior.
+
 
 ## License
 This project is released under terms of the [MIT license](https://raw.githubusercontent.com/PierreAdam/play-ebean-datatables/master/LICENSE).

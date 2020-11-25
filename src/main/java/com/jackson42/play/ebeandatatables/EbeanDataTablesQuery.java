@@ -35,7 +35,6 @@ import com.jackson42.play.ebeandatatables.enumerations.OrderEnum;
 import com.jackson42.play.ebeandatatables.interfaces.TriFunction;
 import io.ebean.ExpressionList;
 import io.ebean.Finder;
-import io.ebean.Model;
 import io.ebean.PagedList;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -61,7 +60,7 @@ import java.util.function.*;
  * @author Pierre Adam
  * @since 20.07.02
  */
-public class EbeanDataTablesQuery<T extends Model> {
+public class EbeanDataTablesQuery<T> {
 
     /**
      * The Logger.
@@ -72,11 +71,6 @@ public class EbeanDataTablesQuery<T extends Model> {
      * The potential prefixes of the getter in the target classes.
      */
     protected static final String[] METHOD_PREFIXES = {"get", "is", "has", "can"};
-
-    /**
-     * The finder of T
-     */
-    private final Finder<?, T> finder;
 
     /**
      * The Messages api.
@@ -107,6 +101,11 @@ public class EbeanDataTablesQuery<T extends Model> {
     private final Map<String, BiConsumer<ExpressionList<T>, OrderEnum>> fieldsOrderHandler;
 
     /**
+     * The initial query supplier allows you to create your own initial query.
+     */
+    private Supplier<ExpressionList<T>> initialQuerySupplier;
+
+    /**
      * The global search supplier. If set, the handler will be called when a search not specific to a field is required.
      */
     private BiConsumer<ExpressionList<T>, String> globalSearchHandler;
@@ -117,9 +116,45 @@ public class EbeanDataTablesQuery<T extends Model> {
     private Consumer<ExpressionList<T>> where;
 
     /**
-     * The initial query supplier allows you to create your own initial query.
+     * Constructor.
+     *
+     * @param initialQuerySupplier the initial query supplier
+     * @param tClass               the tClass
+     * @param messagesApi          the messages api
+     * @param where                the initial where close
      */
-    private Supplier<ExpressionList<T>> initialQuerySupplier;
+    public EbeanDataTablesQuery(final Class<T> tClass, final MessagesApi messagesApi, final Supplier<ExpressionList<T>> initialQuerySupplier, final Consumer<ExpressionList<T>> where) {
+        this.logger = LoggerFactory.getLogger(this.getClass());
+        this.tClass = tClass;
+        this.messagesApi = messagesApi;
+        this.where = where;
+        this.fieldsDisplaySupplier = new HashMap<>();
+        this.fieldsSearchHandler = new HashMap<>();
+        this.fieldsOrderHandler = new HashMap<>();
+        this.globalSearchHandler = null;
+        this.initialQuerySupplier = initialQuerySupplier;
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param initialQuerySupplier the initial query supplier
+     * @param tClass               the tClass
+     * @param messagesApi          the messages api
+     */
+    public EbeanDataTablesQuery(final Class<T> tClass, final MessagesApi messagesApi, final Supplier<ExpressionList<T>> initialQuerySupplier) {
+        this(tClass, messagesApi, initialQuerySupplier, null);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param initialQuerySupplier the initial query supplier
+     * @param tClass               the tClass
+     */
+    public EbeanDataTablesQuery(final Class<T> tClass, final Supplier<ExpressionList<T>> initialQuerySupplier) {
+        this(tClass, null, initialQuerySupplier, null);
+    }
 
     /**
      * Constructor.
@@ -130,16 +165,7 @@ public class EbeanDataTablesQuery<T extends Model> {
      * @param where       the initial where close
      */
     public EbeanDataTablesQuery(final Finder<?, T> finder, final Class<T> tClass, final MessagesApi messagesApi, final Consumer<ExpressionList<T>> where) {
-        this.logger = LoggerFactory.getLogger(this.getClass());
-        this.finder = finder;
-        this.tClass = tClass;
-        this.messagesApi = messagesApi;
-        this.where = where;
-        this.fieldsDisplaySupplier = new HashMap<>();
-        this.fieldsSearchHandler = new HashMap<>();
-        this.fieldsOrderHandler = new HashMap<>();
-        this.globalSearchHandler = null;
-        this.initialQuerySupplier = null;
+        this(tClass, messagesApi, () -> finder.query().where(), where);
     }
 
     /**
@@ -319,22 +345,11 @@ public class EbeanDataTablesQuery<T extends Model> {
      * Set the initial query supplier allows you to create your own initial query.
      *
      * @param initialQuerySupplier the initial query supplier
-     */
-    public void setInitialQuerySupplier(final Supplier<ExpressionList<T>> initialQuerySupplier) {
-        this.initialQuerySupplier = initialQuerySupplier;
-    }
-
-    /**
-     * Get a paged list from the given parameters. Parameters SHOULD come from a form.
-     *
-     * @param parameters the parameters
-     * @return the paged list
-     * @see AjaxQueryForm
-     * @see Parameters
+     * @deprecated Initial query supplier should now be set on the constructor at the place of the Finder.
      */
     @Deprecated
-    public PagedList<T> getPagedList(final Parameters parameters) {
-        return this.getPagedList(parameters, parameters.getIndexedColumns(), null);
+    public void setInitialQuerySupplier(final Supplier<ExpressionList<T>> initialQuerySupplier) {
+        this.initialQuerySupplier = initialQuerySupplier;
     }
 
     /**
@@ -343,13 +358,7 @@ public class EbeanDataTablesQuery<T extends Model> {
      * @return the query
      */
     private ExpressionList<T> forgeQuery() {
-        final ExpressionList<T> query;
-
-        if (this.initialQuerySupplier != null) {
-            query = this.initialQuerySupplier.get();
-        } else {
-            query = this.finder.query().where();
-        }
+        final ExpressionList<T> query = this.initialQuerySupplier.get();
 
         if (this.where != null) {
             this.where.accept(query);

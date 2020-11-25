@@ -12,7 +12,7 @@ libraryDependencies ++= Seq(
   jdbc,
   "com.h2database" % "h2" % "1.4.199",
 
-  "com.github.PierreAdam" % "play-ebean-datatables" % "release~20.07",
+  "com.github.PierreAdam" % "play-ebean-datatables" % "20.11",
   "io.ebean" % "ebean" % "12.3.6",
 
   // To provide an implementation of JAXB-API, which is required by Ebean.
