@@ -13,8 +13,14 @@ $> mvn compile
 $> mvn package
 ```
 
-#### Deployment
+#### Install or deploy
 
+To install in your local repository.
+```shell
+$> mvn install
+```
+
+To deploy to a remote repository.
 ```shell
 $> mvn verify
 $> mvn deploy
@@ -25,9 +31,7 @@ $> mvn deploy
 In your ```build.sbt``` file, you need to add a resolver to jitpack and the dependency for the module. This translate to the following lines.
 
 ```scala
-resolvers += "jitpack" at "https://jitpack.io"
-
-libraryDependencies += "com.github.PierreAdam" % "play-ebean-datatables" % "release~20.10u2"
+libraryDependencies += "com.jackson42.play" % "play-ebean-datatables" % "release~20.11"
 ```
 
 ## How to use the library

@@ -1,21 +1,22 @@
 package controllers;
 
-import com.jackson42.play.ebeandatatables.EbeanDataTablesQuery;
-import com.jackson42.play.ebeandatatables.PlayEbeanDataTables;
 import com.jackson42.play.ebeandatatables.entities.Parameters;
+import com.jackson42.play.ebeandatatables.interfaces.PlayEbeanDataTables;
 import com.typesafe.config.Config;
-import io.ebean.Expr;
+import datatables.AccountDatatables;
 import models.AccountModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.data.FormFactory;
+import play.i18n.MessagesApi;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Results;
-import views.html.accountActions;
 
 import javax.inject.Inject;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 /**
  * Sample controller.
@@ -38,16 +39,24 @@ public class HomeController extends Controller implements PlayEbeanDataTables {
     private final FormFactory formFactory;
 
     /**
+     * The Account datatables.
+     */
+    private final AccountDatatables accountDatatables;
+
+    /**
      * Instantiates a new Home controller.
      *
      * @param config      the config
      * @param formFactory the form factory
+     * @param messagesApi the messages api
      */
     @Inject
     public HomeController(final Config config,
-                          final FormFactory formFactory) {
+                          final FormFactory formFactory,
+                          final MessagesApi messagesApi) {
         this.config = config;
         this.formFactory = formFactory;
+        this.accountDatatables = new AccountDatatables(messagesApi);
     }
 
     /**
@@ -89,58 +98,35 @@ public class HomeController extends Controller implements PlayEbeanDataTables {
                     // Retrieve the parameters from the form.
                     final Parameters parameters = form.getParameters();
 
-                    // Build the EbeanDatatablesQuery from the model finder and the model class.
-                    final EbeanDataTablesQuery<AccountModel> edt = new EbeanDataTablesQuery<>(AccountModel.find, AccountModel.class);
-
-                    // If you want to restrict your query to something specific, like for example a table
-                    // that show all the active account but ignore in every case the ones that are disabled;
-                    // you can use the method setInitialQuerySupplier to forge the initial query yourself.
-                    // ! THIS IS OPTIONAL ! //
-                    edt.setWhere(query -> {
-                        // You can add here something like .eq("active", true) or whatever you want to filter on.
-                    });
-
-                    // The fields id, name and email are in the model and will be solved automatically by default.
-                    // You can however override the default behavior. For example to anonymize data.
-                    // Example
-                    edt.setFieldDisplaySupplier("email", accountModel -> {
-                        // Let's anonymize all the emails that start with the letter a.
-                        if (accountModel.getEmail().startsWith("a")) {
-                            return accountModel.getEmail().replaceAll("[a-z0-9]", "*");
-                        } else {
-                            return accountModel.getEmail();
-                        }
-                    });
-
-                    // On our view, you define a field called "actions" that does not exists on the model.
-                    // Defining a custom field allows you to create calculated values on the fly or give some extra content.
-                    // Right now, we're going to give the "actions" field an HTML content that will allow us to give
-                    // an edition link and a deletion link to the table.
-                    edt.setFieldDisplaySupplier("actions", accountModel -> {
-                        // To get the full advantage of the template, we render a view and get the body of the view as our result.
-                        return accountActions.render(accountModel, request).body();
-                    });
-
-                    // The method setOrderHandler allows you to set a custom way to order a column.
-                    // This is useful if you want to order a field that is not in your model.
-                    // This is totally optional if your field does exists in your model and can be ordered by your database.
-                    edt.setOrderHandler("email", (query, orderEnum) -> {
-                        // This is the equivalent of what EbeanDataTablesQuery will do on it's own !
-                        query.order(String.format("email %s", orderEnum.name()));
-                    });
-
-                    // The default search handler will only search in the field itself. You can however customize the search handler for a column.
-                    // In the page, we declared an input with the id "searchNameOrEmail" but we need to put it on a column of the Datatable.
-                    // So we used the email as our "entry point"
-                    edt.setSearchHandler("email", (query, searchTerm) -> {
-                        query.or(
-                                Expr.ilike("name", String.format("%%%s%%", searchTerm)),
-                                Expr.ilike("email", String.format("%%%s%%", searchTerm))
-                        );
-                    });
-
                     // Finally, we return the json data according to the request parameters.
-                    return Results.ok(edt.getAjaxResult(parameters));
+                    return Results.ok(this.accountDatatables.getAjaxResult(request, parameters));
+                });
+    }
+
+    /**
+     * Post datatables account result async.
+     * <p>
+     * Use completion stage to be non-blocking in case you have some data that take time to be processed.
+     * An even more efficient way would be to assign a specific thread pool.
+     * See https://www.playframework.com/documentation/2.8.x/ThreadPools
+     * </p>
+     *
+     * @param request the request
+     * @return the result
+     */
+    public CompletionStage<Result> POST_DatatablesAccountAsync(final Http.Request request) {
+        return this.dataTablesAjaxRequest(request, this.formFactory,
+                boundForm -> {
+                    // On error callback
+                    this.logger.error("The form is invalid : {}", boundForm.errors());
+                    return CompletableFuture.completedFuture(Results.badRequest());
+                },
+                form -> {
+                    // On success callback
+
+                    return CompletableFuture.supplyAsync(form::getParameters) // Retrieve the parameters from the form.
+                            .thenApply(parameters -> this.accountDatatables.getAjaxResult(request, parameters)) // Get the result from the form parameters.
+                            .thenApply(Results::ok); // Return the result.
                 });
     }
 }

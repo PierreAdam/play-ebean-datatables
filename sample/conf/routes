@@ -3,6 +3,7 @@
 # ~~~~
 
 # An example controller showing a sample home page
-GET         /                controllers.HomeController.GET_Index(request: Request)
+GET         /                      controllers.HomeController.GET_Index(request: Request)
 +nocsrf
-POST        /accounts        controllers.HomeController.POST_DatatablesAccount(request: Request)
+POST        /accounts              controllers.HomeController.POST_DatatablesAccount(request: Request)
+POST        /accounts-async        controllers.HomeController.POST_DatatablesAccountAsync(request: Request)

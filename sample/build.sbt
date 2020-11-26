@@ -3,16 +3,17 @@ organization := "com.jackson42.play.ebeandatables.test"
 
 version := "1.0-SNAPSHOT"
 
-resolvers += "jitpack" at "https://jitpack.io"
-
 lazy val root = (project in file(".")).enablePlugins(PlayJava, PlayEbean)
+
+// Only for testing purpose. Do not use a snapshot version on a final project.
+resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 
 libraryDependencies ++= Seq(
   guice,
   jdbc,
   "com.h2database" % "h2" % "1.4.199",
 
-  "com.github.PierreAdam" % "play-ebean-datatables" % "20.11",
+  "com.jackson42.play" % "play-ebean-datatables" % "20.11",
   "io.ebean" % "ebean" % "12.3.6",
 
   // To provide an implementation of JAXB-API, which is required by Ebean.

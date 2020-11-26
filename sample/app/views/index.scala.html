@@ -43,7 +43,7 @@
         </div>
         <br/>
         <div>
-            <table id="my-list" style="width:100%">
+            <table id="my-list" style="width: 100%">
                 <thead>
                     <tr>
                         <th style="width:">Id</th>
@@ -63,7 +63,7 @@
                     ajax: {
                         type: "POST",
                         contentType: "application/json; charset=utf-8",
-                        url: "@controllers.routes.HomeController.POST_DatatablesAccount()",
+                        url: "@controllers.routes.HomeController.POST_DatatablesAccountAsync()",
                         data: function (d) {
                             return JSON.stringify({parameters: d});
                         }
