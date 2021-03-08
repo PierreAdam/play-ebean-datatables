@@ -51,12 +51,25 @@ handling of the datatable query. The request will be automatically parsed and an
 A minimal controller would look like the following.
 
 ```java
-public class MyController extends Controller implements PlayEbeanDataTables {
+import com.jackson42.play.ebeandatatables.EbeanDataTables;
+import play.i18n.MessagesApi;
+
+public class MyController extends Controller implements DataTablesHelper {
     private final FormFactory formFactory;
 
+    private final EbeanDataTables<MyModel> edt;
+
     @Inject
-    public MyController(final FormFactory formFactory) {
+    public MyController(final FormFactory formFactory, MessagesApi messagesApi) {
         this.formFactory = formFactory;
+        this.edt = EbeanDataTables.create(MyModel.class, messagesApi);
+
+        // Set a custom display suppliers.
+        this.edt.setFieldDisplaySupplier("myField", (myModel, context) -> myModel.getMyDbField().trim());
+        // Set a custom search handler to be able to match a partial search in the database.
+        this.edt.setSearchHandler("myField", (query, search) -> query.ilike("myDbField", String.format("%%%s%%", search)));
+        // Set a custom order handler.
+        this.edt.setOrderHandler("myField", (query, orderEnum) -> query.orderBy(String.format("myDbField %s", orderEnum.name())));
     }
 
     public GET_MyPage(final Http.Request request) {
@@ -71,7 +84,6 @@ public class MyController extends Controller implements PlayEbeanDataTables {
                 },
                 form -> {
                     // Success Callback
-                    final EbeanDataTableQuery<MyModel> edt = new EbeanDataTableQuery<>(MyModel.class);
                     return Results.ok(edt.getAjaxResult(parameters));
                 });
     }
