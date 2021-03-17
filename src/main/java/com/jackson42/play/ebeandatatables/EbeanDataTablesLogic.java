@@ -81,6 +81,7 @@ public class EbeanDataTablesLogic<T> extends SimplePlayDataTables<T, ExpressionL
 
     @Override
     protected void fallbackSearchHandler(final ExpressionList<T> query, final String columnName, final String value) {
+        // No fallback search handler.
     }
 
     @Override
@@ -99,14 +100,17 @@ public class EbeanDataTablesLogic<T> extends SimplePlayDataTables<T, ExpressionL
 
     @Override
     protected void postSearchHook(final ExpressionList<T> query, final EbeanDataTablesPayload<T> payload, final Parameters parameters) {
+        // No post search hook.
     }
 
     @Override
     protected void preOrderHook(final ExpressionList<T> query, final EbeanDataTablesPayload<T> payload, final Parameters parameters) {
+        // No pre order hook.
     }
 
     @Override
     protected void postOrderHook(final ExpressionList<T> query, final EbeanDataTablesPayload<T> payload, final Parameters parameters) {
+        // No post order hook.
     }
 
     @Override

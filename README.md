@@ -1,10 +1,12 @@
 # Play-Ebean-Datatables
 
 [![Latest release](https://img.shields.io/github/v/release/PierreAdam/play-ebean-datatables)](https://github.com/PierreAdam/play-ebean-datatables/releases/latest)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/347f98262ae146ae86ac6b4c6c2844da)](https://www.codacy.com/gh/PierreAdam/play-ebean-datatables/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=PierreAdam/play-ebean-datatables&amp;utm_campaign=Badge_Grade)
 [![Build Status](https://travis-ci.com/PierreAdam/play-ebean-datatables.svg?branch=master)](https://travis-ci.com/PierreAdam/play-ebean-datatables)
 [![GitHub license](https://img.shields.io/github/license/PierreAdam/play-ebean-datatables)](https://raw.githubusercontent.com/PierreAdam/play-ebean-datatables/master/LICENSE)
 
-Play-Ebean-Datatables is a library for play framework that allows you to easily integrate [Datatables](https://datatables.net/) in your Play project that use Ebean as an ORM.
+Play-Ebean-Datatables is a library for play framework that allows you to easily
+integrate [Datatables](https://datatables.net/) in your Play project that use Ebean as an ORM.
 *****
 
 ## Build the library
@@ -14,7 +16,7 @@ $> mvn compile
 $> mvn package
 ```
 
-#### Install or deploy
+### Install or deploy
 
 To install in your local repository.
 
@@ -31,7 +33,8 @@ $> mvn deploy
 
 ## How to import the library
 
-In your ```build.sbt``` file, you need to add a resolver to jitpack and the dependency for the module. This translate to the following lines.
+In your ```build.sbt``` file, you need to add a resolver to jitpack and the dependency for the module. This translate to
+the following lines.
 
 ```scala
 libraryDependencies += "com.jackson42.play" % "play-ebean-datatables" % "21.03"
@@ -45,8 +48,10 @@ An example project with the common use cases is available on the sample folder o
 
 #### Your controller
 
-For easier use, your controller will need to implement the interface `PlayEbeanDataTables`. This will allows you to directly return the method `datatablesAjaxRequest` in your
-handling of the datatable query. The request will be automatically parsed and analyzed. All you will need to do is to forge the answer by using the object `EbeanDataTableQuery`.
+For easier use, your controller will need to implement the interface `PlayEbeanDataTables`. This will allows you to
+directly return the method `datatablesAjaxRequest` in your handling of the datatable query. The request will be
+automatically parsed and analyzed. All you will need to do is to forge the answer by using the
+object `EbeanDataTableQuery`.
 
 A minimal controller would look like the following.
 
@@ -92,8 +97,9 @@ public class MyController extends Controller implements DataTablesHelper {
 
 #### The models
 
-EbeanDataTableQuery will automatically analyze the parameters send from your page, and a query will be build accordingly to your model and data in your view. It is important that
-your models have getters in order for the values to be retrieved from them.
+EbeanDataTableQuery will automatically analyze the parameters send from your page, and a query will be build accordingly
+to your model and data in your view. It is important that your models have getters in order for the values to be
+retrieved from them.
 
 If you have a field called `foo`, the following getter name will be tried :
 
@@ -105,7 +111,8 @@ If you have a field called `foo`, the following getter name will be tried :
 
 ### Your webpage
 
-Your webpage can be build using the scala template engine or anything else. The exemple bellow assume that you are using the scala templates
+Your webpage can be build using the scala template engine or anything else. The exemple bellow assume that you are using
+the scala templates
 
 ```html
 <!DOCTYPE html>
@@ -176,7 +183,7 @@ Your webpage can be build using the scala template engine or anything else. The 
 | 20.11           | 2.8.x        | 12.6.x        | 1.10.x                     |
 | 20.10           | 2.8.x        | 12.4.x        | 1.10.x                     |
 
-## Changelog
+### Changelog
 
 #### 21.03
 
@@ -190,9 +197,11 @@ Your webpage can be build using the scala template engine or anything else. The 
 #### 20.11
 
 - Remove deprecated method `getPagedList`.
-- Deprecate method `setInitialQuerySupplier`. Should only be set on the constructors to avoid race conditions when using the same instance for multiple requests.
+- Deprecate method `setInitialQuerySupplier`. Should only be set on the constructors to avoid race conditions when using
+  the same instance for multiple requests.
 - New constructors allowing more coherent behavior.
 
 ## License
 
-This project is released under terms of the [MIT license](https://raw.githubusercontent.com/PierreAdam/play-ebean-datatables/master/LICENSE).
+This project is released under terms of
+the [MIT license](https://raw.githubusercontent.com/PierreAdam/play-ebean-datatables/master/LICENSE).
