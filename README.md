@@ -3,6 +3,7 @@
 [![Latest release](https://img.shields.io/github/v/release/PierreAdam/play-ebean-datatables)](https://github.com/PierreAdam/play-ebean-datatables/releases/latest)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/347f98262ae146ae86ac6b4c6c2844da)](https://www.codacy.com/gh/PierreAdam/play-ebean-datatables/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=PierreAdam/play-ebean-datatables&amp;utm_campaign=Badge_Grade)
 [![Code Climate maintainability](https://img.shields.io/codeclimate/maintainability-percentage/PierreAdam/play-ebean-datatables)](https://codeclimate.com/github/PierreAdam/play-ebean-datatables)
+[![Snyk Vulnerabilities](https://img.shields.io/snyk/vulnerabilities/github/PierreAdam/play-ebean-datatables)](https://snyk.io/test/github/PierreAdam/play-ebean-datatables?targetFile=pom.xml)
 ![JDK](https://img.shields.io/badge/JDK-1.8+-blue.svg)
 [![Build Status](https://travis-ci.com/PierreAdam/play-ebean-datatables.svg?branch=master)](https://travis-ci.com/PierreAdam/play-ebean-datatables)
 [![GitHub license](https://img.shields.io/github/license/PierreAdam/play-ebean-datatables)](https://raw.githubusercontent.com/PierreAdam/play-ebean-datatables/master/LICENSE)

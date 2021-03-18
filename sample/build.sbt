@@ -11,7 +11,7 @@ resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repos
 libraryDependencies ++= Seq(
   guice,
   jdbc,
-  "com.h2database" % "h2" % "1.4.199",
+  "com.h2database" % "h2" % "1.4.200",
 
   "com.jackson42.play" % "play-ebean-datatables" % "20.11",
   "io.ebean" % "ebean" % "12.3.6",
