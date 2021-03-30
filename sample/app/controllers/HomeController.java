@@ -64,22 +64,29 @@ public class HomeController extends Controller implements DataTablesHelper {
     public Result GET_Index(final Http.Request request) {
         // If the database is empty, building the sample data
         if (AccountModel.find.query().where().findCount() == 0) {
-            final Faker faker = new Faker();
-            final Name name = faker.name();
-            final Random random = new Random();
-
-            for (int i = 0; i < 200; i++) {
-                final String firstName = name.firstName();
-                final String lastName = name.firstName();
-                final String email = String.format("%s.%s@mail.com", firstName.toLowerCase(), lastName.toLowerCase());
-                final AccountModel account = new AccountModel(firstName, lastName, email,
-                        random.nextInt(5) != 0, random.nextInt(10) == 0 ? Role.ADMIN : Role.USER);
-                account.save();
-            }
+            this.generateTestData();
         }
 
         // Distribute the page
         return Results.ok(views.html.index.render(request));
+    }
+
+    /**
+     * Generate some tests data.
+     */
+    private void generateTestData() {
+        final Faker faker = new Faker();
+        final Name name = faker.name();
+        final Random random = new Random();
+
+        for (int i = 0; i < 200; i++) {
+            final String firstName = name.firstName();
+            final String lastName = name.firstName();
+            final String email = String.format("%s.%s@mail.com", firstName.toLowerCase(), lastName.toLowerCase());
+            final AccountModel account = new AccountModel(firstName, lastName, email,
+                    random.nextInt(5) != 0, random.nextInt(10) == 0 ? Role.ADMIN : Role.USER);
+            account.save();
+        }
     }
 
     /**
