@@ -24,11 +24,12 @@
 
 package datatables;
 
-import com.jackson42.play.ebeandatatables.EbeanDataTablesQuery;
+import com.jackson42.play.ebeandatatables.EbeanDataTablesLogic;
 import io.ebean.Expr;
 import models.AccountModel;
 import play.i18n.MessagesApi;
-import views.html.accountActions;
+import views.html.ActionsRender;
+import views.html.EmailRender;
 
 /**
  * AccountDatatables.
@@ -36,7 +37,7 @@ import views.html.accountActions;
  * @author Pierre Adam
  * @since 20.11.26
  */
-public class AccountDatatables extends EbeanDataTablesQuery<AccountModel> {
+public class AccountDatatables extends EbeanDataTablesLogic<AccountModel> {
 
     /**
      * Instantiates a new Account datatables.
@@ -50,29 +51,36 @@ public class AccountDatatables extends EbeanDataTablesQuery<AccountModel> {
         // that show all the active account but ignore in every case the ones that are disabled;
         // you can use the method setInitialQuerySupplier to forge the initial query yourself.
         // ! THIS IS OPTIONAL ! //
-        this.setWhere(query -> {
+        this.setInitProviderConsumer(query -> {
             // You can add here something like .eq("active", true) or whatever you want to filter on.
         });
 
-        // The fields id, name and email are in the model and will be solved automatically by default.
+        // The fields id, uid, firstName, lastName, email and role are in the model and will be solved automatically by default.
         // You can however override the default behavior. For example to anonymize data.
         // Example
-        this.setFieldDisplaySupplier("email", accountModel -> {
-            // Let's anonymize all the emails that start with the letter a.
-            if (accountModel.getEmail().startsWith("a")) {
-                return accountModel.getEmail().replaceAll("[a-z0-9]", "*");
+        this.setFieldDisplaySupplier("uid", accountModel -> {
+            // Let's anonymize all the uid of all account with a first name that start with the letter a.
+            if (accountModel.getFirstName().toLowerCase().startsWith("a")) {
+                return accountModel.getUid().toString().replaceAll("[a-z0-9]", "*");
             } else {
-                return accountModel.getEmail();
+                return accountModel.getUid().toString();
             }
         });
+
+        // We can also customize the rendering of a field using a view specially made for that field.
+        this.setFieldDisplayHtmlSupplier("email",
+                (accountModel, context) -> EmailRender.render(accountModel, context.getRequest()));
 
         // On our view, you define a field called "actions" that does not exists on the model.
         // Defining a custom field allows you to create calculated values on the fly or give some extra content.
         // Right now, we're going to give the "actions" field an HTML content that will allow us to give
         // an edition link and a deletion link to the table.
-        this.setFieldDisplayHtmlSupplier("actions", (accountModel, request, messages) -> {
+        this.setFieldDisplayHtmlSupplier("actions", (accountModel, context) -> {
             // To get the full advantage of the template, we render a view as our result.
-            return accountActions.render(accountModel, request);
+            context.getPayload(); // The Payload for the current request.
+            context.getMessages(); // The messages for the current request. (If MessagesApi was given in the constructor)
+            context.getRequest(); // The current request
+            return ActionsRender.render(accountModel, context.getRequest());
         });
 
         // The method setOrderHandler allows you to set a custom way to order a column.
@@ -88,8 +96,11 @@ public class AccountDatatables extends EbeanDataTablesQuery<AccountModel> {
         // So we used the email as our "entry point"
         this.setSearchHandler("email", (query, searchTerm) -> {
             query.or(
-                    Expr.ilike("name", String.format("%%%s%%", searchTerm)),
-                    Expr.ilike("email", String.format("%%%s%%", searchTerm))
+                    Expr.ilike("firstName", String.format("%%%s%%", searchTerm)),
+                    Expr.or(
+                            Expr.ilike("firstName", String.format("%%%s%%", searchTerm)),
+                            Expr.ilike("email", String.format("%%%s%%", searchTerm))
+                    )
             );
         });
     }

@@ -27,7 +27,7 @@ package com.jackson42.play.ebeandatatables;
 import com.jackson42.play.datatables.entities.Parameters;
 import com.jackson42.play.datatables.entities.internal.DataSource;
 import com.jackson42.play.datatables.enumerations.OrderEnum;
-import com.jackson42.play.datatables.implementation.SimplePlayDataTables;
+import com.jackson42.play.datatables.implementations.SimplePlayDataTables;
 import io.ebean.ExpressionList;
 import io.ebean.Finder;
 import io.ebean.PagedList;

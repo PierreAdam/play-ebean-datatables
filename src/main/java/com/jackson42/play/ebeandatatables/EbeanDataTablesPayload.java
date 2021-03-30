@@ -24,7 +24,7 @@
 
 package com.jackson42.play.ebeandatatables;
 
-import com.jackson42.play.datatables.implementation.BasicPayload;
+import com.jackson42.play.datatables.implementations.BasicPayload;
 import io.ebean.ExpressionList;
 import play.libs.typedmap.TypedKey;
 
