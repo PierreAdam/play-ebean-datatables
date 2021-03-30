@@ -7,7 +7,7 @@
 
     <groupId>com.jackson42.play</groupId>
     <artifactId>play-ebean-datatables</artifactId>
-    <version>21.04-SNAPSHOT</version>
+    <version>21.04</version>
     <packaging>jar</packaging>
     <name>Play-Ebean-DataTables</name>
     <description>A PlayFramework abstraction of the usage of Datatables with Ebean as a source</description>
@@ -25,7 +25,7 @@
         <gpg.keyname>yourkeyhere</gpg.keyname>
 
         <!-- The version of play-datatables -->
-        <playdatatables.version>21.04-SNAPSHOT</playdatatables.version>
+        <playdatatables.version>21.04</playdatatables.version>
     </properties>
 
     <licenses>

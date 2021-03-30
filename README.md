@@ -40,7 +40,7 @@ In your ```build.sbt``` file, you need to add a resolver to jitpack and the depe
 the following lines.
 
 ```scala
-libraryDependencies += "com.jackson42.play" % "play-ebean-datatables" % "21.03"
+libraryDependencies += "com.jackson42.play" % "play-ebean-datatables" % "21.04"
 ```
 
 ## How to use the library
@@ -180,13 +180,20 @@ the scala templates
 
 ## Versions
 
-| Library Version | Play Version | Ebean Version | Tested DataTables Version  |
-|-----------------|--------------|---------------|----------------------------|
-| 21.03           | 2.8.x        | 12.7.x        | 1.10.x                     |
-| 20.11           | 2.8.x        | 12.6.x        | 1.10.x                     |
-| 20.10           | 2.8.x        | 12.4.x        | 1.10.x                     |
+| Library Version | Play DataTable Core | Play Version | Ebean Version | Tested DataTables Version  |
+|-----------------|---------------------|--------------|---------------|----------------------------|
+| 21.04           | 21.04               | 2.8.x        | 12.7.x        | 1.10.x                     |
+| 21.03           | 21.03               | 2.8.x        | 12.7.x        | 1.10.x                     |
+| 20.11           | N/A                 | 2.8.x        | 12.6.x        | 1.10.x                     |
+| 20.10           | N/A                 | 2.8.x        | 12.4.x        | 1.10.x                     |
 
 ### Changelog
+
+#### 21.04
+
+- Update Play DataTable Code library to 21.04.
+- Compilation is now made to be done with Java 11 but compiled for Java 1.8.
+- Update of the sample project to utilize the latest version
 
 #### 21.03
 
