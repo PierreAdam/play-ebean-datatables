@@ -14,12 +14,14 @@
 
 package models;
 
+import enumeration.Role;
 import io.ebean.Finder;
 import io.ebean.Model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import java.util.UUID;
 
 /**
  * AccountModel.
@@ -42,10 +44,22 @@ public class AccountModel extends Model {
     private Long id;
 
     /**
-     * The Name.
+     * The Uid.
      */
-    @Column(name = "name", nullable = false, unique = false)
-    private String name;
+    @Column(name = "uid", nullable = false, unique = true)
+    private final UUID uid;
+
+    /**
+     * The First name.
+     */
+    @Column(name = "first_name", nullable = false, unique = false)
+    private String firstName;
+
+    /**
+     * The Last name.
+     */
+    @Column(name = "last_name", nullable = false, unique = false)
+    private String lastName;
 
     /**
      * The Email.
@@ -54,14 +68,33 @@ public class AccountModel extends Model {
     private String email;
 
     /**
+     * Is the Email validated.
+     */
+    @Column(name = "email_validated", nullable = false, unique = false)
+    private boolean emailValidated;
+
+    /**
+     * The Role.
+     */
+    @Column(name = "role", nullable = false, unique = false)
+    private Role role;
+
+    /**
      * Instantiates a new Account model.
      *
-     * @param name  the name
-     * @param email the email
+     * @param firstName      the first name
+     * @param lastName       the last name
+     * @param email          the email
+     * @param emailValidated the email validated
+     * @param role           the role
      */
-    public AccountModel(final String name, final String email) {
-        this.name = name;
+    public AccountModel(final String firstName, final String lastName, final String email, final boolean emailValidated, final Role role) {
+        this.uid = UUID.randomUUID();
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
+        this.emailValidated = emailValidated;
+        this.role = role;
     }
 
     /**
@@ -70,7 +103,16 @@ public class AccountModel extends Model {
      * @return the id
      */
     public Long getId() {
-        return id;
+        return this.id;
+    }
+
+    /**
+     * Gets uid.
+     *
+     * @return the uid
+     */
+    public UUID getUid() {
+        return this.uid;
     }
 
     /**
@@ -78,17 +120,35 @@ public class AccountModel extends Model {
      *
      * @return the name
      */
-    public String getName() {
-        return this.name;
+    public String getFirstName() {
+        return this.firstName;
     }
 
     /**
-     * Sets name.
+     * Sets first name.
      *
-     * @param name the name
+     * @param firstName the first name
      */
-    public void setName(final String name) {
-        this.name = name;
+    public void setFirstName(final String firstName) {
+        this.firstName = firstName;
+    }
+
+    /**
+     * Gets last name.
+     *
+     * @return the last name
+     */
+    public String getLastName() {
+        return this.lastName;
+    }
+
+    /**
+     * Sets last name.
+     *
+     * @param lastName the last name
+     */
+    public void setLastName(final String lastName) {
+        this.lastName = lastName;
     }
 
     /**
@@ -107,5 +167,41 @@ public class AccountModel extends Model {
      */
     public void setEmail(final String email) {
         this.email = email;
+    }
+
+    /**
+     * Is email validated boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isEmailValidated() {
+        return this.emailValidated;
+    }
+
+    /**
+     * Sets email validated.
+     *
+     * @param emailValidated the email validated
+     */
+    public void setEmailValidated(final boolean emailValidated) {
+        this.emailValidated = emailValidated;
+    }
+
+    /**
+     * Gets role.
+     *
+     * @return the role
+     */
+    public Role getRole() {
+        return this.role;
+    }
+
+    /**
+     * Sets role.
+     *
+     * @param role the role
+     */
+    public void setRole(final Role role) {
+        this.role = role;
     }
 }

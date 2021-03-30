@@ -1,0 +1,5 @@
+@import models.AccountModel
+@(account: AccountModel)(implicit request: Http.Request)
+
+<a href="#" onclick='alert("Edit @account.getFirstName") >
+    Edit</a> <a href="#" onclick='alert("Delete @account.getFirstName")'>Delete</a>

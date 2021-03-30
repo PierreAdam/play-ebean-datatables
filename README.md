@@ -31,7 +31,7 @@ To deploy to a remote repository.
 
 ```shell
 $> mvn verify
-$> mvn deploy
+$> mvn deploy -P release
 ```
 
 ## How to import the library

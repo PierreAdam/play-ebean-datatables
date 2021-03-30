@@ -1,0 +1,13 @@
+@(account: AccountModel)(implicit request: Http.Request)
+
+@if(account.isEmailValidated) {
+    @account.getEmail
+} else {
+    <i>@account.getEmail</i>
+    <b style="
+        font-size: x-small;
+        color: red;
+    ">
+        Not validated
+    </b>
+}

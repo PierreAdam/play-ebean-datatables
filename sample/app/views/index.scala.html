@@ -1,4 +1,4 @@
-@()
+@()(implicit request: Http.Request)
 
 <!DOCTYPE html>
 <html>
@@ -9,35 +9,37 @@
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"/>
         <link rel="stylesheet" href="//cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css"/>
         <script>
-            // Add a DataTableSearch method to jquery in order to make the search input simpler to handle.
-            jQuery.fn.extend({
-                DataTableSearch: function (table, columnNumber, event) {
-                    var $this = $(this);
-                    event = event || "auto";
+                // Add a DataTableSearch method to jquery in order to make the search input simpler to handle.
+                jQuery.fn.extend({
+                    DataTableSearch: function (table, selector, event) {
+                        var $this = $(this);
+                        event = event || "auto";
 
-                    if (event === "auto") {
-                        if ($this.is("input")) {
-                            event = "keyup change";
-                        } else {
-                            event = "change";
+                        if (event === "auto") {
+                            if ($this.is("input")) {
+                                event = "keyup change";
+                            } else {
+                                event = "change";
+                            }
                         }
+
+                        $this.on(event, function () {
+                            var column = table.columns(selector);
+                            if (column.search() !== this.value) {
+                                column.search(this.value).draw();
+                            }
+                        });
+                        return $this;
                     }
-
-                    $this.on(event, function () {
-                        var column = table.columns(columnNumber);
-                        if (column.search() !== this.value) {
-                            column.search(this.value).draw();
-                        }
-                    });
-                    return $this;
-                }
-            })
+                })
         </script>
     </head>
     <body>
         <div>
             <div class="form-group mg-b-10-force">
-                <label for="nameOrEmail" class="form-control-label">Search in name or email</label>
+                <label for="nameOrEmail" class="form-control-label">
+                    Search in the First Name, Last Name or Email column
+                </label>
                 <input type="text" id="nameOrEmail" value="" class="form-control">
             </div>
         </div>
@@ -47,8 +49,11 @@
                 <thead>
                     <tr>
                         <th style="width:">Id</th>
-                        <th>Name</th>
+                        <th>Uid</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
                         <th>Email</th>
+                        <th>Role</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -56,43 +61,56 @@
         </div>
 
         <script>
-            $(document).ready(function () {
-                table = $('#my-list').DataTable({
-                    processing: true,
-                    serverSide: true,
-                    ajax: {
-                        type: "POST",
-                        contentType: "application/json; charset=utf-8",
-                        url: "@controllers.routes.HomeController.POST_DatatablesAccountAsync()",
-                        data: function (d) {
-                            return JSON.stringify({parameters: d});
-                        }
-                    },
-                    searching: true,
-                    dom: "ltipr",
-                    columns: [{
-                        name: "id",
-                        orderable: true,
-                        searchable: true
-                    }, {
-                        name: "name",
-                        orderable: true,
-                        searchable: true
-                    }, {
-                        name: "email",
-                        orderable: true,
-                        searchable: true
-                    }, {
-                        name: "actions",
-                        orderable: false,
-                        searchable: false
-                    }],
-                    order: [[0, "asc"]],
-                    columnDefs: []
+                $(document).ready(function () {
+                    table = $('#my-list').DataTable({
+                        processing: true,
+                        serverSide: true,
+                        ajax: {
+                            type: "POST",
+                            contentType: "application/json; charset=utf-8",
+                            url: "@controllers.routes.HomeController.POST_DatatablesAccount().absoluteURL()",
+                            data: function (d) {
+                                return JSON.stringify({parameters: d});
+                            }
+                        },
+                        searching: true,
+                        dom: "ltipr",
+                        columns: [{
+                            name: "id",
+                            orderable: true,
+                            searchable: true
+                        }, {
+                            name: "uid",
+                            orderable: false,
+                            searchable: false
+                        }, {
+                            name: "firstName",
+                            orderable: true,
+                            searchable: true
+                        }, {
+                            name: "lastName",
+                            orderable: true,
+                            searchable: true
+                        }, {
+                            name: "email",
+                            orderable: true,
+                            searchable: true
+                        }, {
+                            name: "role",
+                            orderable: true,
+                            searchable: true
+                        }, {
+                            name: "actions",
+                            orderable: false,
+                            searchable: false
+                        }],
+                        order: [[0, "asc"]],
+                        columnDefs: []
+                    });
+                    // Set the input nameOrEmail as search field for the column email (it needs to be on an existing column even if it doesn't really match the column purpose)
+                    // Select the column email by it's name see https://datatables.net/reference/type/column-selector
+                    $("#nameOrEmail").DataTableSearch(table, "email:name");
                 });
-                // Set the input nameOrEmail as search field for the column email (2)
-                $("#nameOrEmail").DataTableSearch(table, 2);
-            });
         </script>
     </body>
 </html>
