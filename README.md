@@ -191,7 +191,7 @@ the scala templates
 
 #### 21.04
 
-- Update Play DataTable Code library to 21.04.
+- Update Play DataTable Core library to 21.04.
 - Compilation is now made to be done with Java 11 but compiled for Java 1.8.
 - Update of the sample project to utilize the latest version
 
