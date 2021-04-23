@@ -25,7 +25,7 @@
         <gpg.keyname>yourkeyhere</gpg.keyname>
 
         <!-- The version of play-datatables -->
-        <playdatatables.version>21.04</playdatatables.version>
+        <playdatatables.version>21.04u1</playdatatables.version>
     </properties>
 
     <licenses>
